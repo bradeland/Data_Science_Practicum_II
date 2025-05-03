@@ -32,8 +32,8 @@ From the most recent or all listed jobs:
   - `beautifulsoup4`
   - `pandas`
   - `time`, `random`
-  - email.message
-  - dotenv
-  - csv
-  - smtplib
+  - `email.message`
+  - `dotenv`
+  - `csv`
+  - `smtplib`
 
