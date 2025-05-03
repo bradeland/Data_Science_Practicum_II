@@ -32,8 +32,6 @@ v_file_name ='MSDS_Grads_for_project_testing.csv'
 v_file_path = os.path.join(desktop_path, v_file_name)
 v_file_name_2 = 'MSDS_Grads_2023_with_vals.csv'
 v_file_path_2 = os.path.join(desktop_path, v_file_name_2)
-v_username = 'bradeland@thomasarts.com'
-v_password = 'Karlyel!2'
 
 
 def main():
