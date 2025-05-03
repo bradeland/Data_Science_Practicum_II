@@ -1,4 +1,4 @@
-# Data_Science_Practicum_II
+# Data_Science_Practicum_II - Regis University, Denver Colorado
 
 # 🔍 LinkedIn Experience Scraper
 
