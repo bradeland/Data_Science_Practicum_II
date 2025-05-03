@@ -25,10 +25,15 @@ From the most recent or all listed jobs:
 ## ⚙️ Requirements
 
 - Python 3.9+
-- Google Chrome + ChromeDriver
+- Google Chrome + ChromeDriver (Installed on your project!)
+- Gmail for sending the email to various recipients
 - Packages:
   - `selenium`
   - `beautifulsoup4`
   - `pandas`
   - `time`, `random`
+  - email.message
+  - dotenv
+  - csv
+  - smtplib
 
