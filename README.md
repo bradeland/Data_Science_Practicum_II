@@ -1,8 +1,9 @@
 # Data_Science_Practicum_II - Regis University, Denver Colorado
 
 # 🔍 LinkedIn Experience Scraper
-
-A Python-based tool to extract key details from the **Experience** section of public LinkedIn profiles. Built to help students and researchers save time manually gathering employment data.
+Have you ever had to do the laborius task of going out and finding various pieces of employment information? If so, here's an excellent tool to help save time and money. LinkedIn does change up their format from time to time, so it may work for now and break in the future.
+Do be careful and know the rules and regulations for scraping this data in your area. 
+A Python-based tool to extract key details from the **Experience** section of public LinkedIn profiles. This project was built to help students and researchers save time manually gathering employment data. Thus, they can work on things to better their campus with freed up time!
 
 ## ✨ Features
 
