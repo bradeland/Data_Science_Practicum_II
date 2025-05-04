@@ -28,11 +28,13 @@ time.sleep(sleep_time)
 
 
 desktop_path = os.path.join(os.path.expanduser("~"), "Desktop")
-# todo: modify this filename to whatever you have your .csv saved as!
+# todo: modify this filename to whatever you have your .csv saved as! This one is the one with blank information!
 v_file_name ='MSDS_Grads_for_project_testing.csv'
 v_file_path = os.path.join(desktop_path, v_file_name)
+# todo: modify this filename to whatever you have your .csv saved as! This one is the one with the information once you have the LinkedIn URLs
 v_file_name_2 = 'MSDS_Grads_2023_with_vals.csv'
 v_file_path_2 = os.path.join(desktop_path, v_file_name_2)
+# todo: modify this filename to whatever you have your .csv saved as! This one is the one with the information for UN/PW
 v_file_name ='YEP.txt'
 v_file_path_3 = os.path.join(desktop_path, v_file_name)
 
