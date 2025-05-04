@@ -1,7 +1,7 @@
 """
 Original Developer: Brad Eland
 Class: MSDS Practicum II Regis University
-Class Dates:
+Class Dates: March 2025-May 4th, 2025
 One would normally get the list then load entirely vs. appending each record.  However, I wrote it this way so that I could restart if one record failed! Have to save as utf-8 if want to use the links!
 """
 
@@ -28,22 +28,35 @@ time.sleep(sleep_time)
 
 
 desktop_path = os.path.join(os.path.expanduser("~"), "Desktop")
+# todo: modify this filename to whatever you have your .csv saved as!
 v_file_name ='MSDS_Grads_for_project_testing.csv'
 v_file_path = os.path.join(desktop_path, v_file_name)
 v_file_name_2 = 'MSDS_Grads_2023_with_vals.csv'
 v_file_path_2 = os.path.join(desktop_path, v_file_name_2)
+v_file_name ='YEP.txt'
+v_file_path_3 = os.path.join(desktop_path, v_file_name)
 
 
 def main():
+    # TODO: set this up for at least an idea of what can be done to not have UN/PW hardcoded! You can have a .txt/.csv document or PW manager location you API into. Skip this or hardcode the variable in the locations that are the variables within the definitions!
+    v_no_touch = read_csv(v_file_path_3)
+    v_user_platform = v_no_touch.iloc[0]
+    v_user_platform_final = v_user_platform[0]
+    v_pass_platform = v_no_touch.iloc[1]
+    v_pass_platform_final = v_pass_platform[0]
+    v_user_send_email = v_no_touch.iloc[2]
+    v_user_send_email_final = v_user_send_email[0]
+    v_pass_send_email = v_no_touch.iloc[3]
+    v_pass_send_email_final = v_pass_send_email[0]
     # Todo: you need to have whatever path successfully set-up/in the proper location. Mine is currently just my desktop. If you have a server path (probably more secure), use that.
     # Todo: Filename can be set to whatever, just make sure you have that up top. Make sure to use the correct formatting.
     v_list_to_pass = read_csv(v_file_path)
-    v_driver = d_get_driver(v_username, v_password, url='https://www.linkedin.com/login')
+    v_driver = d_get_driver(v_user_platform_final, v_pass_platform_final, url='https://www.linkedin.com/login')
     d_scrape_linkedin_profile(v_driver, v_list_to_pass)
-    # this sets the header rows after the file has completely loaded! :)  Since it was appending, again because couldn't be certain would run w/out error, it didn't just get inserted 1x.
+    # # this sets the header rows after the file has completely loaded! :)  Since it was appending, again because couldn't be certain would run w/out error, it didn't just get inserted 1x.
     d_add_header_rows(v_file_path_2)
     # this sets up the email send. It's pretty simple from what I've seen to create a hashed password (I'd recommend storing in a place like AWS secrets manager). I'm happy to set one up. They're .40 cents per secret per month! I'd recommend this for any code where a UN/PW is required!
-    d_send_email(v_file_path_2)
+    d_send_email(v_user_send_email_final, v_pass_send_email_final, v_file_path_2)
     # ******************************************************************* bonus for QAing purposes! I ran through about 75 people in 15 minutes checking values from the .csv file*******************************************************************
     # todo: if you have all the links in the .csv and have it stored to the filepath 2 location (you can set-up wherever!), this will open a tab for each record! File needs to be created first in steps above or you can just create with any values.
     v_list_pass_links = read_csv(v_file_path_2)
@@ -55,10 +68,8 @@ def read_csv(v_file_path):
     df_final_no_nan = v_data.fillna('')
     return df_final_no_nan
 
-# 66/167 were blank! Found ~ 60% of the people.
-# this one can iterate through the list of people! you can just run and put a breakpoint on the for loop to get the next record and scroll through what you may need to find. Just a feature add.  You can write to open all the tabs if needed/wanted.  Just figured this would be easier. You can go one at a time and get all the info you need!
-# Again, this is a thought I had afterward so people can QA much easier if they have the URL list of students!  Not necessary, but probably helpful.  I didn't ever get linkedin thinking I was a bot because it was methodical and I was spedning a few seconds looking at the people!
-# I went through 70 on the list of people that I got! There was one person that had "ST. Regis Almasa Capital" as their workplace and their name was close to what was in the list so it pulled them through :( Just didn't quite have the time to filter through every iteration of how things can be gotten!
+
+# I went through 70 on the list of people that I got! There was one person that had "ST. Regis Almasa Capital" as their workplace and their name was close to what was in the list so it pulled them through.
 # I was able to find people that may not show they attended Regis as a college, but it was mentioned in their profile.  Again, linkedin trying to be as helpful as it can!
 def d_open_multiple_tabs(v_list_to_iterate):
     # some values came through as tab separated. One of them being the URL for linkedin profile.  Therefore, used this instead of cleaning at the DF level.
@@ -109,15 +120,15 @@ header = 'FirstName, LastName, School Email, Recipient Primary Major, Recipient 
 
 # this definition is what sends the file via email. You of course can attach to an email you create if you'd like. My plan was based on this being an ongoing project so each time it ran, you'd just send the email!
 # I do know how to set-up to run as often as you'd like w/task scheduler, but the product owner said this is a 1x thing :(  So, I didn't pursue this. Happy to help anybody set this up if it's ongoing!
-def d_send_email(v_pass_file):
+def d_send_email(user, pw, v_pass_file):
     # Gmail credentials
     # It's pretty easy to set up the hashed password! I'm redacting mine, but happy to share how to do this!
     # I followed this AI overview to get mine working: https://www.google.com/search?q=setting+up+hashed+password+for+gmail+sends+emails&rlz=1C1GCEA_enUS941US941&oq=setting+up+hashed+password+for+gmail+sends&gs_lcrp=EgZjaHJvbWUqBwgBECEYoAEyBggAEEUYOTIHCAEQIRigATIHCAIQIRigATIHCAMQIRigAdIBCTE2MDc4ajBqN6gCCLACAfEFOXybp7TJJas&sourceid=chrome&ie=UTF-8
-    GMAIL_USER = "PUT YOUR @ EMAIL HERE"
-    GMAIL_PASSWORD = "HASHED PASSWORD HERE"
+    GMAIL_USER = f'{user}'
+    GMAIL_PASSWORD = f'{pw}'
 
     # Email details
-    TO_EMAIL = "ANY EMAILS HERE, I DIDN'T SEND TO > 1 PERSON, BUT USUALLY NEED A , OR ; SEPARATING MULTIPLE EMAILS!"
+    TO_EMAIL = "brad.eland@gmail.com"
     SUBJECT = "CSV File Attachment"
     BODY = "Hello,\n\nPlease find the attached CSV file.\n\nBest regards."
 
@@ -149,10 +160,10 @@ def d_send_email(v_pass_file):
         print("Error sending email:", e)
 
 
-def d_get_driver(url):
+def d_get_driver(user, pw, url):
     # you can store UN/PW in a secure location like AWS and call from there!
-    v_username = 'your linkedin user'
-    v_password = 'your linkedin password'
+    v_username = f'{user}'
+    v_password = f'{pw}'
     # todo: here's where you can get most recent version of chrome driver.  You'll need to see where this is by going to your chrome version. I can help folks find this. https://googlechromelabs.github.io/chrome-for-testing/#stable
     # calling .exe (installed in the python project for ease of use. Can path anywhere your project is housed!)
     service = Service(executable_path='chromedriver.exe')
@@ -300,10 +311,7 @@ def d_start_writing(v_write):
         print(f"An error occurred: {e}")
 
 
-# # todo: look for "present" in the jobs to check current status/state if employed etc :) If not, assume they're currently looking/unknown! Can only be as reliable as the data provided!
-# # todo: find somebody who has been present at their job with 2+ positions (using me) it will equal "activity"!
-# # todo: complete the list and get it inserting
-def d_start_scraping(driver, search_bar_1):
+def d_start_scraping(driver):
     # todo: https://www.google.com/search?q=scraping+the+experience+section+of+linkedin+using+selenium+and+beautiful+soup&rlz=1C1GCEA_enUS941US941&oq=scraping+the+experience+section+of+linkedin+using+selenium+and+beautiful+soup&gs_lcrp=EgZjaHJvbWUyBggAEEUYOdIBCTI1NTg5ajBqN6gCALACAA&sourceid=chrome&ie=UTF-8#fpstate=ive&vld=cid:2fb1c01f,vid:SQtwhuYJk3M,st:0
     v_linkedin_url = driver.current_url
     # used for testing with > 1 job
