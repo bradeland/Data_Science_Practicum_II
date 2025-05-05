@@ -40,7 +40,8 @@ v_file_path_3 = os.path.join(desktop_path, v_file_name)
 
 
 def main():
-    # TODO: set this up for at least an idea of what can be done to not have UN/PW hardcoded! You can have a .txt/.csv document or PW manager location you API into. Skip this or hardcode the variable in the locations that are the variables within the definitions!
+    # TODO: set this up for at least an idea of what can be done to not have UN/PW hardcoded! You can have a .txt/.csv document or PW manager location you API into. 
+    # Skip this step through line 55 and make sure you hardcode the username and password for both the driver section and the send email definitions!
     v_no_touch = read_csv(v_file_path_3)
     v_user_platform = v_no_touch.iloc[0]
     v_user_platform_final = v_user_platform[0]
