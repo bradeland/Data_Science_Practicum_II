@@ -1,0 +1,6 @@
+user | pw
+youremail@email.com
+yourpa$$word
+
+youremail@email.com
+hashedpa$$word
