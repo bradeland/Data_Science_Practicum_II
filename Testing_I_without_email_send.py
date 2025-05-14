@@ -16,16 +16,9 @@ import csv
 from bs4 import BeautifulSoup
 import time
 import random
-import smtplib
-
-from email.message import EmailMessage
-from dotenv import load_dotenv
-load_dotenv()
 
 # can modify this to be logner sleeps and maybe the program won't think you're a bot!
 sleep_time = random.uniform(7, 15)
-time.sleep(sleep_time)
-
 
 desktop_path = os.path.join(os.path.expanduser("~"), "Desktop")
 # todo: modify this filename to whatever you have your .csv saved as!
@@ -44,10 +37,6 @@ def main():
     v_user_platform_final = v_user_platform[0]
     v_pass_platform = v_no_touch.iloc[1]
     v_pass_platform_final = v_pass_platform[0]
-    v_user_send_email = v_no_touch.iloc[2]
-    v_user_send_email_final = v_user_send_email[0]
-    v_pass_send_email = v_no_touch.iloc[3]
-    v_pass_send_email_final = v_pass_send_email[0]
     # Todo: you need to have whatever path successfully set-up/in the proper location. Mine is currently just my desktop. If you have a server path (probably more secure), use that.
     # Todo: Filename can be set to whatever, just make sure you have that up top. Make sure to use the correct formatting.
     v_list_to_pass = read_csv(v_file_path)
@@ -55,8 +44,6 @@ def main():
     d_scrape_linkedin_profile(v_driver, v_list_to_pass)
     # # this sets the header rows after the file has completely loaded! :)  Since it was appending, again because couldn't be certain would run w/out error, it didn't just get inserted 1x.
     d_add_header_rows(v_file_path_2)
-    # this sets up the email send. It's pretty simple from what I've seen to create a hashed password (I'd recommend storing in a place like AWS secrets manager). I'm happy to set one up. They're .40 cents per secret per month! I'd recommend this for any code where a UN/PW is required!
-    d_send_email(v_user_send_email_final, v_pass_send_email_final, v_file_path_2)
     # ******************************************************************* bonus for QAing purposes! I ran through about 75 people in 15 minutes checking values from the .csv file*******************************************************************
     # todo: if you have all the links in the .csv and have it stored to the filepath 2 location (you can set-up wherever!), this will open a tab for each record! File needs to be created first in steps above or you can just create with any values.
     v_list_pass_links = read_csv(v_file_path_2)
@@ -118,48 +105,6 @@ def d_add_header_rows(v_file_path_to_write):
 header = 'FirstName, LastName, School Email, Recipient Primary Major, Recipient Education Level, Recipient Graduation Date,	Employed, Employer Name, Employer Industry,	Job Title, 	Employment Type FT or PT,	City/State,	LinkedIn URL'
 
 
-# this definition is what sends the file via email. You of course can attach to an email you create if you'd like. My plan was based on this being an ongoing project so each time it ran, you'd just send the email!
-# I do know how to set-up to run as often as you'd like w/task scheduler, but the product owner said this is a 1x thing :(  So, I didn't pursue this. Happy to help anybody set this up if it's ongoing!
-def d_send_email(user, pw, v_pass_file):
-    # Gmail credentials
-    # It's pretty easy to set up the hashed password! I'm redacting mine, but happy to share how to do this!
-    # I followed this AI overview to get mine working: https://www.google.com/search?q=setting+up+hashed+password+for+gmail+sends+emails&rlz=1C1GCEA_enUS941US941&oq=setting+up+hashed+password+for+gmail+sends&gs_lcrp=EgZjaHJvbWUqBwgBECEYoAEyBggAEEUYOTIHCAEQIRigATIHCAIQIRigATIHCAMQIRigAdIBCTE2MDc4ajBqN6gCCLACAfEFOXybp7TJJas&sourceid=chrome&ie=UTF-8
-    GMAIL_USER = f'{user}'
-    GMAIL_PASSWORD = f'{pw}'
-
-    # Email details
-    TO_EMAIL = "brad.eland@gmail.com"
-    SUBJECT = "CSV File Attachment"
-    BODY = "Hello,\n\nPlease find the attached CSV file.\n\nBest regards."
-
-    # File to attach
-    CSV_FILE_PATH = f'{v_pass_file}'
-
-    # Create email message
-    msg = EmailMessage()
-    msg["From"] = GMAIL_USER
-    msg["To"] = TO_EMAIL
-    msg["Subject"] = SUBJECT
-    msg.set_content(BODY)
-
-    # Attach CSV file. You can modify to various subtypes, but I prefer .csv.
-    if os.path.exists(CSV_FILE_PATH):
-        with open(CSV_FILE_PATH, "rb") as file:
-            msg.add_attachment(file.read(), maintype="text", subtype="csv", filename=os.path.basename(CSV_FILE_PATH))
-    else:
-        print("CSV file not found!")
-        exit()
-
-    # Send email via SMTP
-    try:
-        with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
-            server.login(GMAIL_USER, GMAIL_PASSWORD)
-            server.send_message(msg)
-        print("Email sent successfully!")
-    except Exception as e:
-        print("Error sending email:", e)
-
-
 def d_get_driver(user, pw, url):
     # you can store UN/PW in a secure location like AWS and call from there!
     v_username = f'{user}'
@@ -195,6 +140,7 @@ def d_scrape_linkedin_profile(driver, v_list_pass):
         # this uses the .iterrows to iterate through each row. Since there is no DB/fields these will insert into, keeping headers without _, camelcase.
         # Usually, depending on the use, you'd want to not have spaces in headers.
         for index, row in v_list_pass.iterrows():
+            time.sleep(sleep_time)
             print(f'this is the {index} number!')
             v_fn = row['FirstName']
             v_ln = row['LastName']
@@ -236,7 +182,7 @@ def d_scrape_linkedin_profile(driver, v_list_pass):
                         v_top_record = search_bar.find_element(By.XPATH, '/html/body/div[5]/div[3]/div[2]/div/div[1]/main/div/div/div[1]/div/ul[2]/li[1]/div/div/div/div[2]/div/div[1]/div/span[1]/span/a/span/span[1]')
                         v_top_record.click()
                         time.sleep(sleep_time)
-                        v_records_returned = d_start_scraping(driver, search_bar)
+                        v_records_returned = d_start_scraping(driver)
                         # Set all values from column 'age' onward in row 1
                         v_row_to_write = v_list_pass.loc[index, "Employed":] = v_records_returned
                         v_row_to_write_as_list = v_list_pass.iloc[index].tolist()
@@ -254,7 +200,7 @@ def d_scrape_linkedin_profile(driver, v_list_pass):
                         v_top_record = search_bar.find_element(By.XPATH, '/html/body/div[6]/div[3]/div[2]/div/div[1]/main/div/div/div[1]/div/ul[2]/li/div/div/div/div[2]/div[1]/div[1]/div/span[1]/span/a/span/span[1]')
                         v_top_record.click()
                         time.sleep(sleep_time)
-                        v_records_returned = d_start_scraping(driver, search_bar)
+                        v_records_returned = d_start_scraping(driver)
                         # Set all values from column 'age' onward in row 1
                         v_row_to_write = v_list_pass.loc[index, "Employed":] = v_records_returned
                         v_row_to_write_as_list = v_list_pass.iloc[index].tolist()
@@ -272,7 +218,7 @@ def d_scrape_linkedin_profile(driver, v_list_pass):
                         v_top_record = search_bar.find_element(By.XPATH, '/html/body/div[5]/div[3]/div[2]/div/div[1]/main/div/div/div[1]/div/ul/li/div/div/div/div[1]/div[1]/div/div/span[1]/span/a/span/span[1]')
                         v_top_record.click()
                         time.sleep(sleep_time)
-                        v_records_returned = d_start_scraping(driver, search_bar)
+                        v_records_returned = d_start_scraping(driver)
                         # Set all values from column 'age' onward in row 1
                         v_row_to_write = v_list_pass.loc[index, "Employed":] = v_records_returned
                         v_row_to_write_as_list = v_list_pass.iloc[index].tolist()
